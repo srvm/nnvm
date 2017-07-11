@@ -291,9 +291,10 @@ NNVM_DLL int NNSymbolCompose(SymbolHandle sym,
  * \brief create a graph handle from symbol
  * \param symbol The symbol representing the graph.
  * \param graph The graph handle created.
+ * \param name The name of the graph.
  * \return 0 when success, -1 when failure happens
  */
-NNVM_DLL int NNGraphCreate(SymbolHandle symbol, GraphHandle *graph);
+NNVM_DLL int NNGraphCreate(SymbolHandle symbol, GraphHandle *graph, const char* name);
 /*!
  * \brief free the graph handle
  * \param handle The handle to be freed.

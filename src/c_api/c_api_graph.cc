@@ -13,10 +13,11 @@
 
 using namespace nnvm;
 
-int NNGraphCreate(SymbolHandle symbol, GraphHandle *graph) {
+int NNGraphCreate(SymbolHandle symbol, GraphHandle *graph, const char* name) {
   Graph* g = new Graph();
   API_BEGIN();
   g->outputs = static_cast<Symbol*>(symbol)->outputs;
+  g->attrs["name"] = std::make_shared<nnvm::any>(std::string(name));
   *graph = g;
   API_END_HANDLE_ERROR(delete g);
 }

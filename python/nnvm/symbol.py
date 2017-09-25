@@ -129,6 +129,21 @@ class Symbol(SymbolBase):
             self.handle, _base.nn_uint(index), _ctypes.byref(handle)))
         return Symbol(handle=handle)
 
+    def __getattr__(self, key):
+        try:
+            return self.attr(key)
+        except KeyError:
+            raise AttributeError(key)
+
+    def __setattr__(self, key, value):
+        if key in super(Symbol, self).__slots__:
+          super(Symbol, self).__setattr__(key, value)
+        elif self.attr(key) is not None:
+          if isinstance(value, bool):
+            self._set_attr(**{key: int(value)})
+          else:
+            self._set_attr(**{key: value})
+
     def attr(self, key):
         """Get attribute string from the symbol, this function only works for non-grouped symbol.
 

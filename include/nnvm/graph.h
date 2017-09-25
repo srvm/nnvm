@@ -71,7 +71,7 @@ class Graph {
 };
 
 /*!
- * \brief Auxililary data structure to index a graph.
+ * \brief Auxiliary data structure to index a graph.
  *  It maps Nodes in the graph to consecutive integers node_id.
  *  It also maps IndexedGraph::NodeEntry to consecutive integer entry_id.
  *  This allows storing properties of Node and NodeEntry into
@@ -285,6 +285,7 @@ inline void DFSVisit(const std::vector<NodeEntry>& heads,
       [fvisit](GNode n) { fvisit(*n); },  // FVisit
       [](GNode n)->Node* { return n->get(); },  // HashFunc
       [](GNode n)->uint32_t {  // InDegree
+        if (!(*n)) return 0;
         return (*n)->inputs.size() + (*n)->control_deps.size();
       },
       [](GNode n, uint32_t index)->GNode {  // GetInput

@@ -11,6 +11,7 @@
 #include <algorithm>
 #include <utility>
 #include <iostream>
+#include <string>
 #include "./base.h"
 
 namespace nnvm {
@@ -19,7 +20,7 @@ namespace nnvm {
 typedef int64_t dim_t;
 
 /*!
- * \brief A dynamic sized array data strcuture that is optimized for storing
+ * \brief A dynamic sized array data structure that is optimized for storing
  *        small number of elements with same type.
  *
  *  Data will be stored in stack when number of elements is small.
@@ -72,7 +73,7 @@ class Tuple {
   }
   /*!
    * \brief Assign content to tuple from iterator.
-   * \param begin the beginning of iteratro
+   * \param begin the beginning of iterator
    * \param end end the end of the iterator
    * \tparam RandomAccessIterator iterator type
    */
@@ -580,5 +581,44 @@ inline bool Tuple<ValueType>::Load(TStream *strm) {
 }
 
 }  // namespace nnvm
+
+namespace std {
+/*! \brief hash function for Tuple. */
+template<typename T>
+struct hash<nnvm::Tuple<T> > {
+  /*! \brief hash a Tuple into unsigned int */
+  size_t operator()(const nnvm::Tuple<T>& val) const {
+    std::hash<uint32_t> hash_uint;
+    size_t res = hash_uint(val.ndim());
+    for (uint32_t i = 0; i < val.ndim(); ++i) {
+      res = dmlc::HashCombine(res, val[i]);
+    }
+    return res;
+  }
+};
+
+/*! \brief hash function for TShape. */
+template<>
+struct hash<nnvm::TShape> {
+  /*! \brief hash a TShape into unsigned int */
+  size_t operator()(const nnvm::TShape& val) const {
+    std::hash<uint32_t> hash_uint;
+    size_t res = hash_uint(val.ndim());
+    for (uint32_t i = 0; i < val.ndim(); ++i) {
+      res = dmlc::HashCombine(res, val[i]);
+    }
+    return res;
+  }
+};
+}  // namespace std
+
+namespace dmlc {
+template<typename T>
+struct type_name_helper<nnvm::Tuple<T> > {
+  static inline std::string value() {
+    return "tuple of <" + type_name<T>() + ">";
+  }
+};
+}
 
 #endif  // NNVM_TUPLE_H_

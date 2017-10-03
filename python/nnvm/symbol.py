@@ -138,7 +138,7 @@ class Symbol(SymbolBase):
     def __setattr__(self, key, value):
         if key in super(Symbol, self).__slots__:
           super(Symbol, self).__setattr__(key, value)
-        elif self.attr(key) is not None:
+        else:
           if isinstance(value, bool):
             self._set_attr(**{key: int(value)})
           else:

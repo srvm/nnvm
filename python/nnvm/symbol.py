@@ -111,38 +111,18 @@ class Symbol(SymbolBase):
                                            _ctypes.byref(handle)))
         return Symbol(handle)
 
-    def __getitem__(self, index):
-        if isinstance(index, _base.string_types):
-            idx = None
-            for i, name in enumerate(self.list_output_names()):
-                if name == index:
-                    if idx is not None:
-                        raise ValueError('There are multiple outputs with name \"%s\"' % index)
-                    idx = i
-            if idx is None:
-                raise ValueError('Cannot find output that matches name \"%s\"' % index)
-            index = idx
-        if not isinstance(index, int):
-            raise TypeError('Symbol only support integer index to fetch i-th output')
-        handle = _base.SymbolHandle()
-        _check_call(_LIB.NNSymbolGetOutput(
-            self.handle, _base.nn_uint(index), _ctypes.byref(handle)))
-        return Symbol(handle=handle)
-
-    def __getattr__(self, key):
+    def __getitem__(self, key):
         try:
             return self.attr(key)
         except KeyError:
             raise AttributeError(key)
 
-    def __setattr__(self, key, value):
-        if key in super(Symbol, self).__slots__:
-          super(Symbol, self).__setattr__(key, value)
+    def __setitem__(self, key, value):
+        key = key.replace('::', '_')
+        if isinstance(value, bool):
+          self._set_attr(**{key: int(value)})
         else:
-          if isinstance(value, bool):
-            self._set_attr(**{key: int(value)})
-          else:
-            self._set_attr(**{key: value})
+          self._set_attr(**{key: value})
 
     def attr(self, key):
         """Get attribute string from the symbol, this function only works for non-grouped symbol.
